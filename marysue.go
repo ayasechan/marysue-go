@@ -8,29 +8,29 @@ import (
 )
 
 type Marysue struct {
-	Key    [32]byte
+	key    [32]byte
 	nonce  []byte
-	cipher cipher.AEAD
+	Cipher cipher.AEAD
 }
 
 func NewMarysue(password string) *Marysue {
 	key := sha256.Sum256([]byte(password))
 	aead, _ := chacha20poly1305.NewX(key[:])
 	return &Marysue{
-		Key:    key,
+		key:    key,
 		nonce:  make([]byte, chacha20poly1305.NonceSizeX),
-		cipher: aead,
+		Cipher: aead,
 	}
 }
 
 func (m *Marysue) Encrypt(s string) string {
-	data := m.cipher.Seal(nil, m.nonce, []byte(s), nil)
+	data := m.Cipher.Seal(nil, m.nonce, []byte(s), nil)
 	return ByteArrayToString(data)
 }
 
 func (m *Marysue) Decrypt(s string) (string, error) {
 	data := StringToByteArray(s)
-	data, err := m.cipher.Open(nil, m.nonce, data, nil)
+	data, err := m.Cipher.Open(nil, m.nonce, data, nil)
 	if err != nil {
 		return "", err
 	}
